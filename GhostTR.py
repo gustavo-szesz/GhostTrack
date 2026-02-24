@@ -51,7 +51,13 @@ def get_hostname(ip):
     try:
         return socket.gethostbyaddr(ip)[0]
     except (socket.herror, socket.gaierror):
-        return "Unknown"
+        try:
+            result = os.popen(f"nslookup {ip} 2>/dev/null | grep 'name ='").read()
+            if result:
+                return result.split("=")[1].strip()
+        except:
+            pass
+        return "Unable to retrieve"
     
 def get_mac_address(ip):
     """Get MAC address from IP (Linux/Mac only)"""
